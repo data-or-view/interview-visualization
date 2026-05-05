@@ -1,0 +1,70 @@
+{"no": "mysql", "ev": "recv", "cat": "conn", "idx": 0, "ts": 1777916506000, "dt": 15, "thr": "thread-per-conn", "ts_state": "init", "cid": 1}
+{"no": "mysql", "ev": "start", "cat": "client", "idx": 1, "ts": 1777916506003, "dt": 0, "thr": "thread-per-conn", "ts_state": "login", "cid": 1}
+{"no": "mysql", "ev": "parse", "cat": "sql", "idx": 2, "ts": 1777916506006, "dt": 94, "thr": "thread-per-conn", "ts_state": "parsing", "cid": 1, "query": "INSERT INTO t1 VALUES(1,\"hello\")", "table": "t1"}
+{"no": "mysql", "ev": "optimize", "cat": "sql", "idx": 3, "ts": 1777916506009, "dt": 180, "thr": "thread-per-conn", "ts_state": "optimizing", "cid": 1, "plan": "insert(t1)", "table": "t1"}
+{"no": "mysql", "ev": "exec", "cat": "innodb", "idx": 4, "ts": 1777916506013, "dt": 336, "thr": "thread-per-conn", "ts_state": "executing", "cid": 1, "rows": 1, "table": "t1", "xid": 1000}
+{"no": "mysql", "ev": "undo_write", "cat": "undo", "idx": 5, "ts": 1777916506015, "dt": 6, "thr": "thread-per-conn", "ts_state": "Updating", "cid": 1, "undo_no": 1, "undo_type": "INSERT", "table": "t1", "xid": 1000}
+{"no": "mysql", "ev": "redo_prepare", "cat": "redo", "idx": 6, "ts": 1777916506018, "dt": 6, "thr": "thread-per-conn", "ts_state": "flushing redo log", "cid": 1, "lsn": 10000, "xid": 1000}
+{"no": "mysql", "ev": "binlog_write", "cat": "binlog", "idx": 7, "ts": 1777916506021, "dt": 7, "thr": "thread-per-conn", "ts_state": "Writing to binlog", "cid": 1, "xid": 1000, "binlog_pos": 100, "table": "t1"}
+{"no": "mysql", "ev": "redo_commit", "cat": "redo", "idx": 8, "ts": 1777916506024, "dt": 2, "thr": "thread-per-conn", "ts_state": "flushing redo log", "cid": 1, "lsn": 10010, "xid": 1000}
+{"no": "mysql", "ev": "commit", "cat": "innodb", "idx": 9, "ts": 1777916506027, "dt": 7, "thr": "thread-per-conn", "ts_state": "committing", "cid": 1, "xid": 1000}
+{"no": "mysql", "ev": "flush_dirty", "cat": "data", "idx": 10, "ts": 1777916506030, "dt": 45, "thr": "thread-per-conn", "ts_state": "flushing", "cid": 1, "page_no": 101}
+{"no": "mysql", "ev": "cleaning", "cat": "conn", "idx": 11, "ts": 1777916506033, "dt": 10, "thr": "thread-per-conn", "ts_state": "cleaning up", "cid": 1}
+{"no": "mysql", "ev": "recv", "cat": "conn", "idx": 12, "ts": 1777916506036, "dt": 6, "thr": "thread-per-conn", "ts_state": "init", "cid": 2}
+{"no": "mysql", "ev": "start", "cat": "client", "idx": 13, "ts": 1777916506039, "dt": 0, "thr": "thread-per-conn", "ts_state": "login", "cid": 2}
+{"no": "mysql", "ev": "parse", "cat": "sql", "idx": 14, "ts": 1777916506043, "dt": 83, "thr": "thread-per-conn", "ts_state": "parsing", "cid": 2, "query": "UPDATE t1 SET val=\"world\" WHERE id=1", "table": "t1"}
+{"no": "mysql", "ev": "optimize", "cat": "sql", "idx": 15, "ts": 1777916506045, "dt": 60, "thr": "thread-per-conn", "ts_state": "optimizing", "cid": 2, "plan": "pk_scan(t1.id_idx)", "table": "t1"}
+{"no": "mysql", "ev": "exec", "cat": "innodb", "idx": 16, "ts": 1777916506049, "dt": 74, "thr": "thread-per-conn", "ts_state": "executing", "cid": 2, "rows": 1, "table": "t1", "xid": 1001}
+{"no": "mysql", "ev": "lock_wait", "cat": "lock", "idx": 17, "ts": 1777916506071, "dt": 1235, "thr": "thread-per-conn", "ts_state": "Waiting for row lock", "cid": 2, "lock_type": "X", "waiting_for": "T1", "table": "t1"}
+{"no": "mysql", "ev": "undo_write", "cat": "undo", "idx": 18, "ts": 1777916506054, "dt": 15, "thr": "thread-per-conn", "ts_state": "Updating", "cid": 2, "undo_no": 2, "undo_type": "UPDATE", "table": "t1", "xid": 1001}
+{"no": "mysql", "ev": "redo_prepare", "cat": "redo", "idx": 19, "ts": 1777916506057, "dt": 5, "thr": "thread-per-conn", "ts_state": "flushing redo log", "cid": 2, "lsn": 20000, "xid": 1001}
+{"no": "mysql", "ev": "binlog_write", "cat": "binlog", "idx": 20, "ts": 1777916506060, "dt": 7, "thr": "thread-per-conn", "ts_state": "Writing to binlog", "cid": 2, "xid": 1001, "binlog_pos": 200, "table": "t1"}
+{"no": "mysql", "ev": "redo_commit", "cat": "redo", "idx": 21, "ts": 1777916506063, "dt": 5, "thr": "thread-per-conn", "ts_state": "flushing redo log", "cid": 2, "lsn": 20010, "xid": 1001}
+{"no": "mysql", "ev": "commit", "cat": "innodb", "idx": 22, "ts": 1777916506066, "dt": 12, "thr": "thread-per-conn", "ts_state": "committing", "cid": 2, "xid": 1001}
+{"no": "mysql", "ev": "flush_dirty", "cat": "data", "idx": 23, "ts": 1777916506069, "dt": 32, "thr": "thread-per-conn", "ts_state": "flushing", "cid": 2, "page_no": 102}
+{"no": "mysql", "ev": "cleaning", "cat": "conn", "idx": 24, "ts": 1777916506072, "dt": 2, "thr": "thread-per-conn", "ts_state": "cleaning up", "cid": 2}
+{"no": "mysql", "ev": "recv", "cat": "conn", "idx": 25, "ts": 1777916506075, "dt": 8, "thr": "thread-per-conn", "ts_state": "init", "cid": 3}
+{"no": "mysql", "ev": "start", "cat": "client", "idx": 26, "ts": 1777916506078, "dt": 0, "thr": "thread-per-conn", "ts_state": "login", "cid": 3}
+{"no": "mysql", "ev": "parse", "cat": "sql", "idx": 27, "ts": 1777916506083, "dt": 87, "thr": "thread-per-conn", "ts_state": "parsing", "cid": 3, "query": "SELECT * FROM t1 WHERE id BETWEEN 1 AND 100", "table": "t1"}
+{"no": "mysql", "ev": "optimize", "cat": "sql", "idx": 28, "ts": 1777916506090, "dt": 216, "thr": "thread-per-conn", "ts_state": "optimizing", "cid": 3, "plan": "range_scan(t1.id_idx)", "table": "t1"}
+{"no": "mysql", "ev": "exec", "cat": "innodb", "idx": 29, "ts": 1777916506089, "dt": 76, "thr": "thread-per-conn", "ts_state": "executing", "cid": 3, "rows": 5, "table": "t1"}
+{"no": "mysql", "ev": "page_read", "cat": "innodb", "idx": 30, "ts": 1777916506091, "dt": 58, "thr": "thread-per-conn", "ts_state": "reading from file", "cid": 3, "page_no": 117, "table": "t1"}
+{"no": "mysql", "ev": "page_read", "cat": "innodb", "idx": 31, "ts": 1777916506095, "dt": 77, "thr": "thread-per-conn", "ts_state": "reading from file", "cid": 3, "page_no": 117, "table": "t1"}
+{"no": "mysql", "ev": "page_read", "cat": "innodb", "idx": 32, "ts": 1777916506100, "dt": 127, "thr": "thread-per-conn", "ts_state": "reading from file", "cid": 3, "page_no": 184, "table": "t1"}
+{"no": "mysql", "ev": "cleaning", "cat": "conn", "idx": 33, "ts": 1777916506099, "dt": 5, "thr": "thread-per-conn", "ts_state": "cleaning up", "cid": 3}
+{"no": "mysql", "ev": "recv", "cat": "conn", "idx": 34, "ts": 1777916506102, "dt": 23, "thr": "thread-per-conn", "ts_state": "init", "cid": 4}
+{"no": "mysql", "ev": "start", "cat": "client", "idx": 35, "ts": 1777916506105, "dt": 0, "thr": "thread-per-conn", "ts_state": "login", "cid": 4}
+{"no": "mysql", "ev": "parse", "cat": "sql", "idx": 36, "ts": 1777916506109, "dt": 50, "thr": "thread-per-conn", "ts_state": "parsing", "cid": 4, "query": "DELETE FROM t1 WHERE id=3", "table": "t1"}
+{"no": "mysql", "ev": "optimize", "cat": "sql", "idx": 37, "ts": 1777916506115, "dt": 114, "thr": "thread-per-conn", "ts_state": "optimizing", "cid": 4, "plan": "pk_scan(t1)", "table": "t1"}
+{"no": "mysql", "ev": "exec", "cat": "innodb", "idx": 38, "ts": 1777916506119, "dt": 135, "thr": "thread-per-conn", "ts_state": "executing", "cid": 4, "rows": 1, "table": "t1", "xid": 1002}
+{"no": "mysql", "ev": "undo_write", "cat": "undo", "idx": 39, "ts": 1777916506117, "dt": 6, "thr": "thread-per-conn", "ts_state": "Updating", "cid": 4, "undo_no": 3, "undo_type": "DELETE", "table": "t1", "xid": 1002}
+{"no": "mysql", "ev": "redo_prepare", "cat": "redo", "idx": 40, "ts": 1777916506120, "dt": 5, "thr": "thread-per-conn", "ts_state": "flushing redo log", "cid": 4, "lsn": 30000, "xid": 1002}
+{"no": "mysql", "ev": "binlog_write", "cat": "binlog", "idx": 41, "ts": 1777916506123, "dt": 11, "thr": "thread-per-conn", "ts_state": "Writing to binlog", "cid": 4, "xid": 1002, "binlog_pos": 300, "table": "t1"}
+{"no": "mysql", "ev": "redo_commit", "cat": "redo", "idx": 42, "ts": 1777916506126, "dt": 5, "thr": "thread-per-conn", "ts_state": "flushing redo log", "cid": 4, "lsn": 30010, "xid": 1002}
+{"no": "mysql", "ev": "commit", "cat": "innodb", "idx": 43, "ts": 1777916506129, "dt": 13, "thr": "thread-per-conn", "ts_state": "committing", "cid": 4, "xid": 1002}
+{"no": "mysql", "ev": "flush_dirty", "cat": "data", "idx": 44, "ts": 1777916506133, "dt": 28, "thr": "thread-per-conn", "ts_state": "flushing", "cid": 4, "page_no": 105}
+{"no": "mysql", "ev": "cleaning", "cat": "conn", "idx": 45, "ts": 1777916506135, "dt": 7, "thr": "thread-per-conn", "ts_state": "cleaning up", "cid": 4}
+{"no": "mysql", "ev": "recv", "cat": "conn", "idx": 46, "ts": 1777916506138, "dt": 12, "thr": "thread-per-conn", "ts_state": "init", "cid": 5}
+{"no": "mysql", "ev": "start", "cat": "client", "idx": 47, "ts": 1777916506141, "dt": 0, "thr": "thread-per-conn", "ts_state": "login", "cid": 5}
+{"no": "mysql", "ev": "parse", "cat": "sql", "idx": 48, "ts": 1777916506146, "dt": 60, "thr": "thread-per-conn", "ts_state": "parsing", "cid": 5, "query": "SELECT * FROM t1 AS OF TIMESTAMP ...", "table": "t1"}
+{"no": "mysql", "ev": "optimize", "cat": "sql", "idx": 49, "ts": 1777916506158, "dt": 229, "thr": "thread-per-conn", "ts_state": "optimizing", "cid": 5, "plan": "full_scan(t1)", "table": "t1"}
+{"no": "mysql", "ev": "exec", "cat": "innodb", "idx": 50, "ts": 1777916506164, "dt": 280, "thr": "thread-per-conn", "ts_state": "executing", "cid": 5, "rows": 10, "table": "t1"}
+{"no": "mysql", "ev": "undo_read", "cat": "undo", "idx": 51, "ts": 1777916506153, "dt": 0, "thr": "thread-per-conn", "ts_state": "", "cid": 5, "undo_no": 1}
+{"no": "mysql", "ev": "undo_read", "cat": "undo", "idx": 52, "ts": 1777916506156, "dt": 0, "thr": "thread-per-conn", "ts_state": "", "cid": 5, "undo_no": 2}
+{"no": "mysql", "ev": "page_read", "cat": "innodb", "idx": 53, "ts": 1777916506162, "dt": 65, "thr": "thread-per-conn", "ts_state": "reading from file", "cid": 5, "page_no": 114, "table": "t1"}
+{"no": "mysql", "ev": "page_read", "cat": "innodb", "idx": 54, "ts": 1777916506170, "dt": 150, "thr": "thread-per-conn", "ts_state": "reading from file", "cid": 5, "page_no": 146, "table": "t1"}
+{"no": "mysql", "ev": "cleaning", "cat": "conn", "idx": 55, "ts": 1777916506165, "dt": 9, "thr": "thread-per-conn", "ts_state": "cleaning up", "cid": 5}
+{"no": "mysql", "ev": "flush_dirty", "cat": "data", "idx": 56, "ts": 1777916506169, "dt": 29, "thr": "thread-per-conn", "ts_state": "flushing", "cid": null, "page_no": 200}
+{"no": "mysql", "ev": "flush_dirty", "cat": "data", "idx": 57, "ts": 1777916506175, "dt": 76, "thr": "thread-per-conn", "ts_state": "flushing", "cid": null, "page_no": 201}
+{"no": "mysql", "ev": "recv", "cat": "conn", "idx": 58, "ts": 1777916506175, "dt": 19, "thr": "thread-per-conn", "ts_state": "init", "cid": 6}
+{"no": "mysql", "ev": "start", "cat": "client", "idx": 59, "ts": 1777916506177, "dt": 0, "thr": "thread-per-conn", "ts_state": "login", "cid": 6}
+{"no": "mysql", "ev": "parse", "cat": "sql", "idx": 60, "ts": 1777916506185, "dt": 90, "thr": "thread-per-conn", "ts_state": "parsing", "cid": 6, "query": "UPDATE t1 SET val=\"test\" WHERE id=5", "table": "t1"}
+{"no": "mysql", "ev": "optimize", "cat": "sql", "idx": 61, "ts": 1777916506192, "dt": 162, "thr": "thread-per-conn", "ts_state": "optimizing", "cid": 6, "plan": "pk_scan(t1)", "table": "t1"}
+{"no": "mysql", "ev": "exec", "cat": "innodb", "idx": 62, "ts": 1777916506198, "dt": 194, "thr": "thread-per-conn", "ts_state": "executing", "cid": 6, "rows": 1, "table": "t1", "xid": 1003}
+{"no": "mysql", "ev": "undo_write", "cat": "undo", "idx": 63, "ts": 1777916506189, "dt": 12, "thr": "thread-per-conn", "ts_state": "Updating", "cid": 6, "undo_no": 4, "undo_type": "UPDATE", "table": "t1", "xid": 1003}
+{"no": "mysql", "ev": "redo_prepare", "cat": "redo", "idx": 64, "ts": 1777916506192, "dt": 7, "thr": "thread-per-conn", "ts_state": "flushing redo log", "cid": 6, "lsn": 40000, "xid": 1003}
+{"no": "mysql", "ev": "binlog_write", "cat": "binlog", "idx": 65, "ts": 1777916506195, "dt": 11, "thr": "thread-per-conn", "ts_state": "Writing to binlog", "cid": 6, "xid": 1003, "binlog_pos": 400, "table": "t1"}
+{"no": "mysql", "ev": "redo_commit", "cat": "redo", "idx": 66, "ts": 1777916506198, "dt": 1, "thr": "thread-per-conn", "ts_state": "flushing redo log", "cid": 6, "lsn": 40010, "xid": 1003}
+{"no": "mysql", "ev": "commit", "cat": "innodb", "idx": 67, "ts": 1777916506201, "dt": 11, "thr": "thread-per-conn", "ts_state": "committing", "cid": 6, "xid": 1003}
+{"no": "mysql", "ev": "flush_dirty", "cat": "data", "idx": 68, "ts": 1777916506205, "dt": 27, "thr": "thread-per-conn", "ts_state": "flushing", "cid": 6, "page_no": 110}
+{"no": "mysql", "ev": "cleaning", "cat": "conn", "idx": 69, "ts": 1777916506207, "dt": 9, "thr": "thread-per-conn", "ts_state": "cleaning up", "cid": 6}
