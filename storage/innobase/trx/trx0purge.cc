@@ -65,6 +65,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 #include "trx0roll.h"
 #include "trx0rseg.h"
 #include "trx0trx.h"
+#include "trace_log.h"
 
 /** Maximum allowable purge history length.  <=0 means 'infinite'. */
 ulong srv_max_purge_lag = 0;
@@ -2395,6 +2396,11 @@ ulint trx_purge(ulint n_purge_threads, /*!< in: number of purge tasks
 {
   que_thr_t *thr = nullptr;
   ulint n_pages_handled;
+
+  TRACE_EVENT_FLOW_BG("mvcc", "purge", "mvcc", "undo",
+              "Purging old records",
+              ",\"batch_size\":%lu,\"n_threads\":%lu",
+              (unsigned long)batch_size, (unsigned long)n_purge_threads);
 
   ut_a(n_purge_threads > 0);
 

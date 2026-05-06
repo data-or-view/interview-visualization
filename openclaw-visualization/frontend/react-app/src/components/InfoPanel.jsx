@@ -23,7 +23,8 @@ export default function InfoPanel({ events, currentEvent, currentIndex }) {
   const catLabel = {
     conn: '连接', sql: 'SQL', innodb: 'InnoDB',
     undo: 'Undo', redo: 'Redo', binlog: 'Binlog',
-    data: 'Data', lock: '锁', misc: '杂项',
+    data: 'Data', lock: '锁', mvcc: 'MVCC',
+    row: 'Row Ptrs', misc: '杂项',
   }
 
   const evLabel = {
@@ -35,6 +36,9 @@ export default function InfoPanel({ events, currentEvent, currentIndex }) {
     flush_dirty: '刷脏页', page_read: '读页面',
     start: '连接建立', cleaning: '清理',
     commit: '事务提交',
+    read_view: '创建快照', read_done: '释放快照',
+    purge: '清理旧版本',
+    hidden_ptrs: '隐藏指针更新',
   }
 
   return (
@@ -52,16 +56,41 @@ export default function InfoPanel({ events, currentEvent, currentIndex }) {
           ['当前事件', currentEvent ? (evLabel[currentEvent.ev] || currentEvent.ev) : '-'],
           ['事件类型', currentEvent?.ev || '-'],
           ['所属分类', currentEvent?.cat ? (catLabel[currentEvent.cat] || currentEvent.cat) : '-'],
+          ['输入来源', currentEvent?.from || '-'],
+          ['输出目标', currentEvent?.to || '-'],
           ['线程状态', currentEvent?.ts_state || '-'],
           ['线程模式', currentEvent?.thr || 'thread-per-conn'],
           ['连接ID', currentEvent?.cid != null ? String(currentEvent.cid) : '-'],
+          ['事务ID', currentEvent?.trx_id != null ? String(currentEvent.trx_id) : '-'],
         ].map(([k, v]) => (
           <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 0', fontSize: '0.78rem', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
             <span style={{ color: '#94a3b8' }}>{k}</span>
             <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{v}</span>
           </div>
         ))}
+        {/* input 字段 */}
+        {currentEvent?.input && (
+          <div style={{ marginTop: 6, padding: '6px 8px', background: 'rgba(30,41,59,0.8)', borderRadius: 6, border: '1px solid rgba(102,126,234,0.15)' }}>
+            <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginBottom: 3 }}>输入数据 (input)</div>
+            <div style={{ fontSize: '0.7rem', color: '#e2e8f0', wordBreak: 'break-all', fontFamily: 'monospace', maxHeight: 60, overflow: 'auto' }}>
+              {currentEvent.input.length > 200 ? currentEvent.input.slice(0, 200) + '...' : currentEvent.input}
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* 锁信息卡片 */}
+      {currentEvent?.ev === 'lock_wait' && (
+        <div style={{ background: 'rgba(236,72,153,0.1)', borderRadius: 8, padding: 10, marginBottom: 10,
+          border: '1px solid rgba(236,72,153,0.4)' }}>
+          <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#ec4899', marginBottom: 4 }}>
+            🔒 锁等待
+          </div>
+          <div style={{ fontSize: '0.75rem', color: '#f472b6' }}>
+            等待获取行锁，当前被其他事务持有
+          </div>
+        </div>
+      )}
 
       {/* 2PC 上下文 */}
       {currentEvent?.xid != null && (
@@ -78,6 +107,51 @@ export default function InfoPanel({ events, currentEvent, currentIndex }) {
             <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 0', fontSize: '0.75rem' }}>
               <span style={{ color: '#94a3b8' }}>{k}</span>
               <span style={{ color: '#fdba74', fontWeight: 600 }}>{v}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* 隐藏指针卡片 (hidden_ptrs) */}
+      {currentEvent?.ev === 'hidden_ptrs' && (
+        <div style={{ background: 'rgba(244,63,94,0.1)', borderRadius: 8, padding: 10, marginBottom: 10,
+          border: '1px solid rgba(244,63,94,0.4)' }}>
+          <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#f43f5e', marginBottom: 4 }}>
+            📍 隐藏指针更新
+          </div>
+          {[
+            ['数据表', currentEvent.table || '-'],
+            ['旧 DB_TRX_ID', currentEvent.old_trx_id != null ? String(currentEvent.old_trx_id) : '-'],
+            ['新 DB_TRX_ID', currentEvent.new_trx_id != null ? String(currentEvent.new_trx_id) : '-'],
+            ['DB_ROLL_PTR', currentEvent.roll_ptr != null ? String(currentEvent.roll_ptr) : '-'],
+          ].map(([k, v]) => (
+            <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 0', fontSize: '0.75rem' }}>
+              <span style={{ color: '#94a3b8' }}>{k}</span>
+              <span style={{ color: '#fca5a5', fontWeight: 600 }}>{v}</span>
+            </div>
+          ))}
+          <div style={{ fontSize: '0.7rem', color: '#fb7185', marginTop: 6, borderTop: '1px solid rgba(244,63,94,0.2)', paddingTop: 6 }}>
+            DB_TRX_ID 记录最后修改该行的事务 ID，DB_ROLL_PTR 指向 Undo 日志中的旧版本
+          </div>
+        </div>
+      )}
+
+      {/* MVCC 上下文 (read_view / read_done / purge) */}
+      {currentEvent?.cat === 'mvcc' && (
+        <div style={{ background: 'rgba(6,182,212,0.1)', borderRadius: 8, padding: 10, marginBottom: 10,
+          border: '1px solid rgba(6,182,212,0.4)' }}>
+          <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#22d3ee', marginBottom: 4 }}>
+            👁️ MVCC 上下文
+          </div>
+          {[
+            ['操作', evLabel[currentEvent.ev] || currentEvent.ev],
+            ['事务 ID', currentEvent.trx_id != null ? String(currentEvent.trx_id) : '-'],
+            ['批大小', currentEvent.batch_size != null ? String(currentEvent.batch_size) : '-'],
+            ['线程数', currentEvent.n_threads != null ? String(currentEvent.n_threads) : '-'],
+          ].map(([k, v]) => (
+            <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 0', fontSize: '0.75rem' }}>
+              <span style={{ color: '#94a3b8' }}>{k}</span>
+              <span style={{ color: '#67e8f9', fontWeight: 600 }}>{v}</span>
             </div>
           ))}
         </div>

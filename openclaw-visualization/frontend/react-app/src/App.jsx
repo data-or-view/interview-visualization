@@ -4,6 +4,7 @@ import { MYSQL_LAYOUT } from './config/mysql'
 import NodeGraph from './components/NodeGraph'
 import InfoPanel from './components/InfoPanel'
 import Timeline from './components/Timeline'
+import BtreeCanvas from './components/BtreeCanvas'
 import './App.css'
 
 export default function App() {
@@ -13,12 +14,19 @@ export default function App() {
   const [filterCat, setFilterCat] = useState('all')
   const [currentIndex, setCurrentIndex] = useState(-1)
   const [playing, setPlaying] = useState(false)
-  const [loopMode, setLoopMode] = useState(false)
+  const [loopMode, setLoopMode] = useState(true)
+  const [viewMode, setViewMode] = useState('arch') // 'arch' | 'btree'
+
+  // 自动播放
+  useEffect(() => {
+    if (events.length > 0 && !playing) {
+      setPlaying(true)
+    }
+  }, [events.length])
   const timerRef = useRef(null)
 
   const currentEvent = currentIndex >= 0 && currentIndex < events.length ? events[currentIndex] : null
 
-  // 自动播放
   useEffect(() => {
     if (!playing || events.length === 0) return
     const dt = currentEvent?.dt || 100
@@ -43,8 +51,9 @@ export default function App() {
   }, [playing, currentIndex, events.length])
 
   const onReset = useCallback(() => {
-    setPlaying(false); setCurrentIndex(-1)
-  }, [])
+    setCurrentIndex(-1)
+    if (!playing) setPlaying(true)
+  }, [playing])
 
   const onSeek = useCallback((idx) => {
     setCurrentIndex(idx); setPlaying(false)
@@ -54,14 +63,26 @@ export default function App() {
   const highlightComp = currentEvent ? evToComponent[currentEvent.ev] : null
   const activeEdge = !!(currentEvent && MYSQL_LAYOUT.evToEdge[currentEvent.ev])
 
+  const tabStyle = (active) => ({
+    background: active ? '#30363d' : 'transparent',
+    border: '1px solid #30363d', borderRadius: 4,
+    color: active ? '#e2e8f0' : '#64748b',
+    padding: '3px 10px', cursor: 'pointer', fontSize: '0.75rem'
+  })
+
   return (
     <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* 顶部控制栏 */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px',
         background: '#161b22', borderBottom: '1px solid #30363d' }}>
         <span style={{ fontWeight: 700, color: '#667eea', fontSize: '0.95rem' }}>MySQL 可视化</span>
-        <span style={{ color: '#64748b', fontSize: '0.7rem' }}>/ 单节点</span>
-        <div style={{ flex: 1 }} />
+        <button onClick={() => setViewMode('arch')} style={tabStyle(viewMode === 'arch')}>
+          🏗 架构图
+        </button>
+        <button onClick={() => setViewMode('btree')} style={tabStyle(viewMode === 'btree')}>
+          🌲 B+ 树
+        </button>
+        <div style={{ width: 1, height: 20, background: '#30363d' }} />
 
         <span style={{ color: '#64748b', fontSize: '0.75rem' }}>数据:</span>
         <input value={url} onChange={e => setUrl(e.target.value)}
@@ -85,46 +106,47 @@ export default function App() {
         <span style={{ color: '#64748b', fontSize: '0.75rem' }}>
           {events.length} 事件 | {events.length > 0 ? `${((currentIndex + 1) / events.length * 100).toFixed(1)}%` : '0%'}
         </span>
-
-        <div style={{ width: 1, height: 20, background: '#30363d' }} />
-        <span style={{ color: '#64748b', fontSize: '0.75rem' }}>过滤:</span>
-        <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
-          style={{ background: '#0d1117', color: '#e2e8f0', border: '1px solid #30363d', borderRadius: 4, padding: '3px', fontSize: '0.75rem' }}>
-          <option value="all">全部</option>
-          {Object.keys(MYSQL_LAYOUT.catColors).map(c => <option key={c} value={c}>{c}</option>)}
-        </select>
       </div>
 
       {/* 主体 */}
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        {/* SVG 节点图 */}
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {loading ? (
-            <span style={{ color: '#64748b' }}>加载中...</span>
-          ) : error ? (
-            <span style={{ color: '#ef4444' }}>加载失败: {error}</span>
-          ) : (
-            <NodeGraph currentEvent={currentEvent} highlightComp={highlightComp}
-              activeEdge={activeEdge} />
-          )}
-        </div>
-
-        {/* 右侧面板 */}
-        <div style={{ width: 280, borderLeft: '1px solid #30363d', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          {/* InfoPanel */}
-          <div style={{ flex: 1, overflow: 'auto', padding: 12, borderBottom: '1px solid #30363d' }}>
-            {!loading && !error && (
-              <InfoPanel events={events} currentEvent={currentEvent} currentIndex={currentIndex} />
+      {viewMode === 'arch' ? (
+        <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {loading ? (
+              <span style={{ color: '#64748b' }}>加载中...</span>
+            ) : error ? (
+              <span style={{ color: '#ef4444' }}>加载失败: {error}</span>
+            ) : (
+              <NodeGraph currentEvent={currentEvent} highlightComp={highlightComp}
+                activeEdge={activeEdge} />
             )}
           </div>
-          {/* Timeline */}
-          <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
-            {!loading && !error && (
-              <Timeline events={events} currentIndex={currentIndex} onSeek={onSeek} />
+          <div style={{ width: 280, borderLeft: '1px solid #30363d', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ flex: 1, overflow: 'auto', padding: 12, borderBottom: '1px solid #30363d' }}>
+              {!loading && !error && (
+                <InfoPanel events={events} currentEvent={currentEvent} currentIndex={currentIndex} />
+              )}
+            </div>
+            <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
+              {!loading && !error && (
+                <Timeline events={events} currentIndex={currentIndex} onSeek={onSeek} />
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+          <div style={{ flex: 1, overflow: 'auto' }}>
+            {loading ? (
+              <span style={{ color: '#64748b', padding: 40, display: 'block' }}>加载中...</span>
+            ) : error ? (
+              <span style={{ color: '#ef4444', padding: 40, display: 'block' }}>加载失败: {error}</span>
+            ) : (
+              <BtreeCanvas events={events} currentIndex={currentIndex} />
             )}
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

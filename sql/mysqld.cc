@@ -1260,6 +1260,10 @@ handlerton *myisam_hton;
 handlerton *innodb_hton;
 
 char *opt_disabled_storage_engines;
+
+/* --trace-file=FILE 可视化追踪日志 */
+char *opt_trace_file = nullptr;
+
 uint opt_server_id_bits = 0;
 ulong opt_server_id_mask = 0;
 bool read_only = false, opt_readonly = false;

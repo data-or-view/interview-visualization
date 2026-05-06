@@ -57,6 +57,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 #include <log.h>
 #include <math.h>
 #include <my_compare.h>
+#include "trace_log.h"
 #include <mysqld.h>
 #include <stdlib.h>
 #include <strfunc.h>
@@ -5974,6 +5975,13 @@ static int innobase_commit(handlerton *hton, /*!< in: InnoDB handlerton */
   DBUG_TRACE;
   assert(hton == innodb_hton_ptr);
   DBUG_PRINT("trans", ("ending transaction"));
+
+  /* TRACE: commit */
+  if (commit_trx) {
+    TRACE_EVENT_FLOW("innodb", "commit", "innodb", "innodb",
+                thd->thread_id(), "committing", "");
+  }
+
   DEBUG_SYNC_C("transaction_commit_start");
 
   trx_t *trx = check_trx_exists(thd);
@@ -6115,6 +6123,13 @@ static int innobase_commit(handlerton *hton, /*!< in: InnoDB handlerton */
   trx->fts_next_doc_id = 0;
 
   innobase_srv_conc_force_exit_innodb(trx);
+
+  /* TRACE: redo_commit */
+  if (commit_trx) {
+    TRACE_EVENT(",\"cat\":\"redo\",\"ev\":\"redo_commit\",\"cid\":%d,\"ts_state\":\"flushing redo log\""
+                ",\"thr\":\"thread-per-conn\"",
+                thd->thread_id());
+  }
 
   return 0;
 }
@@ -20194,6 +20209,13 @@ static int innobase_xa_prepare(handlerton *hton, /*!< in: InnoDB handlerton */
   trx_t *trx = check_trx_exists(thd);
 
   assert(hton == innodb_hton_ptr);
+
+  /* TRACE: redo_prepare */
+  if (prepare_trx) {
+    TRACE_EVENT(",\"cat\":\"redo\",\"ev\":\"redo_prepare\",\"cid\":%d,\"ts_state\":\"flushing redo log\""
+                ",\"thr\":\"thread-per-conn\"",
+                thd->thread_id());
+  }
 
   thd_get_xid(thd, (MYSQL_XID *)trx->xid);
 

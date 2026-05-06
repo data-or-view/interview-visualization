@@ -9,7 +9,7 @@ function edgeEndpoints(f, t) {
   }
 }
 
-export default function FlowEdge({ edge, components, active, activeColor }) {
+export default function FlowEdge({ edge, components, active, activeColor, traceFrom, traceTo }) {
   const f = components.find(c => c.id === edge.from)
   const t = components.find(c => c.id === edge.to)
   if (!f || !t) return null
@@ -17,6 +17,9 @@ export default function FlowEdge({ edge, components, active, activeColor }) {
 
   // 自环边（同一组件）→ 跳过画线
   if (edge.from === edge.to) return null
+
+  // 跳过背景组件的边
+  if (f.bg || t.bg) return null
 
   return (
     <g>
@@ -39,6 +42,17 @@ export default function FlowEdge({ edge, components, active, activeColor }) {
                 path={`M${pts.x1},${pts.y1} L${pts.x2},${pts.y2}`} />
             </circle>
           ))}
+          {/* from/to 标签 */}
+          {traceFrom && traceTo && (
+            <>
+              <text x={(pts.x1 + pts.x2) / 2} y={(pts.y1 + pts.y2) / 2 - 8}
+                textAnchor="middle" dominantBaseline="middle"
+                fill={activeColor} fontSize={7} fontWeight={600}
+                opacity={0.8}>
+                {traceFrom} → {traceTo}
+              </text>
+            </>
+          )}
         </>
       )}
     </g>

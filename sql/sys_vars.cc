@@ -156,6 +156,7 @@
 #include "storage/perfschema/pfs_server.h"
 #include "storage/perfschema/terminology_use_previous.h"
 #endif /* WITH_PERFSCHEMA_STORAGE_ENGINE */
+#include "trace_log.h"  // opt_trace_file
 
 static constexpr const unsigned long DEFAULT_ERROR_COUNT{1024};
 static constexpr const unsigned long DEFAULT_SORT_MEMORY{256UL * 1024UL};
@@ -5701,6 +5702,12 @@ static Sys_var_charptr Sys_general_log_path(
     GLOBAL_VAR(opt_general_logname), CMD_LINE(REQUIRED_ARG), IN_FS_CHARSET,
     DEFAULT(nullptr), NO_MUTEX_GUARD, NOT_IN_BINLOG, ON_CHECK(check_log_path),
     ON_UPDATE(fix_general_log_file));
+
+/* --trace-file — 可视化追踪日志输出路径 */
+static Sys_var_charptr Sys_trace_log_path(
+    "trace_file", "Path to trace log output for visualization",
+    GLOBAL_VAR(opt_trace_file), CMD_LINE(REQUIRED_ARG), IN_FS_CHARSET,
+    DEFAULT(nullptr), NO_MUTEX_GUARD, NOT_IN_BINLOG);
 
 static bool fix_slow_log_file(sys_var *, THD *thd [[maybe_unused]],
                               enum_var_type) {

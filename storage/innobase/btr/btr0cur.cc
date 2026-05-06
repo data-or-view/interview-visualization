@@ -95,6 +95,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 #endif /* !UNIV_HOTBACKUP */
 
 #include <array>
+#include "trace_log.h"
 
 /** Buffered B-tree operation types, introduced as part of delete buffering. */
 enum btr_op_t {
@@ -1303,6 +1304,31 @@ retry_page_get:
     offsets = rec_get_offsets(node_ptr, index, offsets, ULINT_UNDEFINED,
                               UT_LOCATION_HERE, &heap);
 
+    /* TRACE: B+ tree search at internal page */
+    if (__builtin_expect(opt_trace_file != nullptr, 0)) {
+      page_no_t btree_child_pg =
+          btr_node_ptr_get_child_page_no(node_ptr, offsets);
+      FILE *btf = fopen(opt_trace_file, "a");
+      if (btf) {
+        fprintf(btf,
+                "{"
+                "\"cat\":\"btree\",\"ev\":\"btree_search\""
+                ",\"ts\":%lld"
+                ",\"index\":\"%s\",\"type\":\"%s\",\"table\":\"%s\""
+                ",\"page_no\":%lu,\"level\":%lu,\"n_recs\":%lu,"
+                "\"child_pg\":%lu}\n",
+                (long long)trace_current_ms(),
+                index->name(),
+                index->is_clustered() ? "clustered" : "secondary",
+                static_cast<const char *>(index->table_name),
+                (unsigned long)page_id.page_no(),
+                (unsigned long)(height + 1),
+                (unsigned long)page_get_n_recs(page),
+                (unsigned long)btree_child_pg);
+        fclose(btf);
+      }
+    }
+
     /* If the rec is the first or last in the page for
     pessimistic delete intention, it might cause node_ptr insert
     for the upper level. We should change the intention and retry.
@@ -1645,6 +1671,20 @@ retry_page_get:
       cursor->up_match = up_match;
     }
   } else {
+    /* TRACE: B+ tree leaf arrival */
+    {
+      page_t *bt_page = buf_block_get_frame(block);
+      (void)bt_page; /* used in trace */
+      TRACE_EVENT_FLOW_BG("btree", "btree_search", "btree", "btree",
+          "searched",
+          ",\"index\":\"%s\",\"type\":\"%s\",\"table\":\"%s\""
+          ",\"page_no\":%lu,\"level\":0,\"n_recs\":%lu",
+          index->name(),
+          index->is_clustered() ? "clustered" : "secondary",
+          static_cast<const char *>(index->table_name),
+          (unsigned long)page_id.page_no(),
+          (unsigned long)page_get_n_recs(bt_page));
+    }
     cursor->low_match = low_match;
     cursor->low_bytes = low_bytes;
     cursor->up_match = up_match;
@@ -3385,6 +3425,15 @@ dberr_t btr_cur_update_in_place(ulint flags, btr_cur_t *cursor, ulint *offsets,
   }
 
   if (!(flags & BTR_KEEP_SYS_FLAG) && !index->table->is_intrinsic()) {
+    /* TRACE: hidden_ptrs — DB_TRX_ID and DB_ROLL_PTR before overwrite */
+    TRACE_EVENT_FLOW_BG("innodb", "hidden_ptrs", "row", "innodb",
+                "Updating row ptrs",
+                ",\"table\":\"%s\",\"old_trx_id\":%llu,\"new_trx_id\":%llu"
+                ",\"roll_ptr\":%llu",
+                index->table_name,
+                (unsigned long long)rec_get_trx_id(rec, index),
+                (unsigned long long)trx_id,
+                (unsigned long long)roll_ptr);
     row_upd_rec_sys_fields(rec, nullptr, index, offsets, thr_get_trx(thr),
                            roll_ptr);
   }
@@ -4348,6 +4397,16 @@ dberr_t btr_cur_del_mark_set_clust_rec(
   if (dict_index_is_online_ddl(index)) {
     row_log_table_delete(rec, entry, index, offsets, nullptr);
   }
+
+  /* TRACE: hidden_ptrs for delete mark */
+  TRACE_EVENT_FLOW_BG("innodb", "hidden_ptrs", "row", "innodb",
+              "Delete mark row ptrs",
+              ",\"table\":\"%s\",\"old_trx_id\":%llu,\"new_trx_id\":%llu"
+              ",\"roll_ptr\":%llu",
+              index->table_name,
+              (unsigned long long)rec_get_trx_id(rec, index),
+              (unsigned long long)trx->id,
+              (unsigned long long)roll_ptr);
 
   row_upd_rec_sys_fields(rec, page_zip, index, offsets, trx, roll_ptr);
 

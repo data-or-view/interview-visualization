@@ -55,6 +55,7 @@
 #include "my_psi_config.h"
 #include "my_sqlcommand.h"
 #include "my_sys.h"  // MEM_DEFINED_IF_ADDRESSABLE()
+#include "trace_log.h"
 #include "myisam.h"  // TT_FOR_UPGRADE
 #include "mysql/binlog/event/binlog_event.h"
 #include "mysql/components/services/bits/psi_bits.h"
@@ -8055,6 +8056,12 @@ int handler::ha_write_row(uchar *buf) {
 
   DBUG_TRACE;
   DBUG_EXECUTE_IF("inject_error_ha_write_row", return HA_ERR_INTERNAL_ERROR;);
+
+  /* TRACE: exec (write row) */
+  TRACE_EVENT_FLOW("innodb", "exec", "executor", "storage_if",
+              ha_thd()->thread_id(), "executing",
+              ",\"table\":\"%s\",\"rows\":1,\"input\":\"write_row\"",
+              table_share->table_name.str);
   DBUG_EXECUTE_IF("simulate_storage_engine_out_of_memory",
                   return HA_ERR_SE_OUT_OF_MEMORY;);
   mark_trx_read_write();

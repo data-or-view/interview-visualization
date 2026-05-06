@@ -51,6 +51,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 #include "srv0start.h"
 #include "trx0sys.h"
 #include "ut0new.h"
+#include "trace_log.h"
 
 /** There must be at least this many pages in buf_pool in the area to start
 a random read-ahead */
@@ -286,6 +287,11 @@ read_ahead:
 }
 
 bool buf_read_page(const page_id_t &page_id, const page_size_t &page_size) {
+  /* TRACE: page_read */
+  TRACE_EVENT_FLOW_BG("innodb", "page_read", "data", "innodb", "reading from file",
+              ",\"thr\":\"background\",\"page_no\":%u",
+              page_id.page_no());
+
   ulint count;
   dberr_t err;
 

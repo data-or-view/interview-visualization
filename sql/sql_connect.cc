@@ -96,6 +96,7 @@
 
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
+#include "trace_log.h"
 #endif
 
 using std::max;
@@ -733,6 +734,10 @@ static bool login_connection(THD *thd) {
 void end_connection(THD *thd) {
   NET *net = thd->get_protocol_classic()->get_net();
 
+  /* TRACE: cleaning */
+  TRACE_EVENT_FLOW("conn", "cleaning", "connector", "external",
+              thd->thread_id(), "cleaning up", "");
+
   mysql_event_tracking_connection_notify(
       thd, AUDIT_EVENT(EVENT_TRACKING_CONNECTION_DISCONNECT), 0);
 
@@ -892,6 +897,10 @@ static void prepare_new_connection_state(THD *thd) {
 
 bool thd_prepare_connection(THD *thd) {
   thd->enable_mem_cnt();
+
+  /* TRACE: start (connection established) */
+  TRACE_EVENT_FLOW("client", "start", "external", "client",
+              thd->thread_id(), "login", "");
 
   bool rc;
   lex_start(thd);

@@ -58,6 +58,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 #include "lob0undo.h"
 #include "lock0lock.h"
 #include "mach0data.h"
+#include "trace_log.h"
 #include "pars0pars.h"
 #include "pars0sym.h"
 #include "que0que.h"
@@ -5432,6 +5433,26 @@ rec_loop:
   if (index != clust_index && prebuilt->need_to_access_clustered) {
   requires_clust_rec:
     ut_ad(index != clust_index);
+
+    /* TRACE: 回表 - secondary index → clustered index */
+    if (__builtin_expect(opt_trace_file != nullptr, 0)) {
+      FILE *btf = fopen(opt_trace_file, "a");
+      if (btf) {
+        fprintf(btf,
+                "{"
+                "\"cat\":\"btree\",\"ev\":\"back_to_table\""
+                ",\"ts\":%lld"
+                ",\"table\":\"%s\""
+                ",\"sec_index\":\"%s\",\"clust_index\":\"%s\""
+                "}\n",
+                (long long)trace_current_ms(),
+                static_cast<const char *>(index->table_name),
+                index->name(),
+                clust_index->name());
+        fclose(btf);
+      }
+    }
+
     /* We use a 'goto' to the preceding label if a consistent
     read of a secondary index record requires us to look up old
     versions of the associated clustered index record. */

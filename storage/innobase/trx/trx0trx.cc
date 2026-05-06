@@ -70,6 +70,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 #include "my_dbug.h"
 #include "mysql/plugin.h"
 #include "sql/clone_handler.h"
+#include "trace_log.h"
 
 static const ulint MAX_DETAILED_ERROR_LEN = 256;
 
@@ -646,6 +647,9 @@ inline void trx_disconnect_from_mysql(trx_t *trx, bool prepared) {
 
   if (trx->read_view != nullptr) {
     trx_sys->mvcc->view_close(trx->read_view, true);
+    TRACE_EVENT_FLOW_BG("mvcc", "read_done", "mvcc", "innodb",
+                "Snapshot closed",
+                ",\"trx_id\":%lu", (unsigned long)trx->id);
   }
 
   ut_ad(trx_sys_validate_trx_list());
@@ -1845,6 +1849,9 @@ static void trx_erase_lists(trx_t *trx) {
 
     if (trx->read_view != nullptr) {
       trx_sys->mvcc->view_close(trx->read_view, true);
+      TRACE_EVENT_FLOW_BG("mvcc", "read_done", "mvcc", "innodb",
+                  "Snapshot closed",
+                  ",\"trx_id\":%lu", (unsigned long)trx->id);
     }
   }
   DEBUG_SYNC_C("after_trx_erase_lists");
@@ -1995,6 +2002,9 @@ written */
 
     if (trx->read_view != nullptr) {
       trx_sys->mvcc->view_close(trx->read_view, false);
+      TRACE_EVENT_FLOW_BG("mvcc", "read_done", "mvcc", "innodb",
+                  "Snapshot closed",
+                  ",\"trx_id\":%lu", (unsigned long)trx->id);
     }
 
     MONITOR_INC(MONITOR_TRX_NL_RO_COMMIT);
@@ -2018,6 +2028,9 @@ written */
       MONITOR_INC(MONITOR_TRX_RO_COMMIT);
       if (trx->read_view != nullptr) {
         trx_sys->mvcc->view_close(trx->read_view, false);
+        TRACE_EVENT_FLOW_BG("mvcc", "read_done", "mvcc", "innodb",
+                    "Snapshot closed",
+                    ",\"trx_id\":%lu", (unsigned long)trx->id);
       }
 
     } else {
@@ -2323,6 +2336,9 @@ ReadView *trx_assign_read_view(trx_t *trx) /*!< in/out: active transaction */
 
   } else if (!MVCC::is_view_active(trx->read_view)) {
     trx_sys->mvcc->view_open(trx->read_view, trx);
+    TRACE_EVENT_FLOW_BG("mvcc", "read_view", "innodb", "mvcc",
+                "Creating snapshot",
+                ",\"trx_id\":%lu", (unsigned long)trx->id);
   }
 
   return (trx->read_view);

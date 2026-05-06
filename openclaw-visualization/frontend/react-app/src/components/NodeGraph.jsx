@@ -10,6 +10,9 @@ export default function NodeGraph({ currentEvent, highlightComp, activeEdge, que
   const cat = currentEvent?.cat
   const color = cat ? (catColors[cat] || '#64748b') : '#64748b'
 
+  const traceFrom = currentEvent?.from
+  const traceTo = currentEvent?.to
+
   return (
     <svg viewBox={MYSQL_LAYOUT.viewBox} style={{ width: '100%', height: '100%' }}>
       <defs>
@@ -27,7 +30,7 @@ export default function NodeGraph({ currentEvent, highlightComp, activeEdge, que
       )}
 
       {/* 标题 */}
-      <text x={0} y={MYSQL_LAYOUT.viewBox.split(' ').slice(1).shift()} 
+      <text x={0} y={parseFloat(MYSQL_LAYOUT.viewBox.split(' ')[1]) - 8} 
         textAnchor="middle" fill="#64748b" fontSize={11}>
         {MYSQL_LAYOUT.title}
       </text>
@@ -37,7 +40,8 @@ export default function NodeGraph({ currentEvent, highlightComp, activeEdge, que
         <FlowEdge key={`${e.from}-${e.to}`}
           edge={e} components={components}
           active={activeEdge && edge && edge.from === e.from && edge.to === e.to}
-          activeColor={color} />
+          activeColor={color}
+          traceFrom={traceFrom} traceTo={traceTo} />
       ))}
 
       {/* 节点 */}

@@ -190,6 +190,8 @@
 #include "sql/debug_lock_order.h"
 #endif /* WITH_LOCK_ORDER */
 
+#include "trace_log.h"
+
 namespace resourcegroups {
 class Resource_group;
 }  // namespace resourcegroups
@@ -2093,6 +2095,11 @@ bool dispatch_command(THD *thd, const COM_DATA *com_data,
         break;  // fatal error is set
       }
 
+      /* TRACE: recv */
+      TRACE_EVENT_FLOW_IN("conn", "recv", "client", "connector",
+                  thd->thread_id(), "executing",
+                  thd->query().str);
+
       const char *packet_end = thd->query().str + thd->query().length;
 
       if (opt_general_log_raw)
@@ -2907,6 +2914,14 @@ static inline void binlog_gtid_end_transaction(THD *thd) {
 int mysql_execute_command(THD *thd, bool first_level) {
   int res = false;
   LEX *const lex = thd->lex;
+
+  /* TRACE: parse */
+  if (first_level && thd->query().str != nullptr) {
+    TRACE_EVENT_FLOW_IN("sql", "parse", "connector", "parser",
+                thd->thread_id(), "parsing",
+                thd->query().str);
+  }
+
   /* first Query_block (have special meaning for many of non-SELECTcommands) */
   Query_block *const query_block = lex->query_block;
   /* first table of first Query_block */

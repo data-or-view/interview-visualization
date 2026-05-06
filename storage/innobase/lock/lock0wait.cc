@@ -46,6 +46,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 #include "srv0start.h"
 
 #include "my_dbug.h"
+#include "trace_log.h"
 
 /** Print the contents of the lock_sys_t::waiting_threads array. */
 static void lock_wait_table_print(void) {
@@ -208,6 +209,12 @@ void lock_wait_suspend_thread(que_thr_t *thr) {
   trx_t *trx;
 
   trx = thr_get_trx(thr);
+
+  /* TRACE: lock_wait */
+  TRACE_EVENT_FLOW_BG("lock", "lock_wait", "innodb", "lock", "Waiting for row lock",
+              ",\"thr\":\"thread-per-conn\""
+              ",\"thr_id\":%lu",
+              (unsigned long)pthread_self());
 
   if (trx->mysql_thd != nullptr) {
     DEBUG_SYNC_C("lock_wait_suspend_thread_enter");

@@ -57,6 +57,8 @@ this program; if not, write to the Free Software Foundation, Inc.,
 #include "trx0rseg.h"
 #include "ut0mem.h"
 
+#include "trace_log.h"
+
 #include "my_dbug.h"
 
 namespace dd {
@@ -2132,6 +2134,14 @@ dberr_t trx_undo_report_row_operation(
                                  0 if BTR_NO_UNDO_LOG
                                  flag was specified */
 {
+  /* TRACE: undo_write */
+  TRACE_EVENT_FLOW_BG("undo", "undo_write", "innodb", "undo", "Updating",
+              ",\"thr\":\"thread-per-conn\",\"table\":\"%s\""
+              ",\"undo_type\":\"%s\",\"trx_id\":%lu",
+              index->table_name,
+              (op_type == TRX_UNDO_INSERT_OP ? "INSERT" : "UPDATE"),
+              (unsigned long)(thr != nullptr ? thr_get_trx(thr)->id : 0));
+
   trx_t *trx;
   trx_undo_t *undo;
   page_no_t page_no;

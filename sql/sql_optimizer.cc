@@ -35,6 +35,7 @@
 #include "sql/sql_optimizer.h"
 #include "my_base.h"
 #include "sql/sql_optimizer_internal.h"
+#include "trace_log.h"
 
 #include <limits.h>
 #include <algorithm>
@@ -361,6 +362,10 @@ static void MoveUnstructuredToStructuredTrace(THD *thd) {
 */
 bool JOIN::optimize(bool finalize_access_paths) {
   DBUG_TRACE;
+
+  /* TRACE: optimize */
+  TRACE_EVENT_FLOW("sql", "optimize", "parser", "optimizer",
+              thd->thread_id(), "optimizing", "");
 
   uint no_jbuf_after = UINT_MAX;
   Query_block *const set_operand_block =

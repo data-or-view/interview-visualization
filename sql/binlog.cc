@@ -148,6 +148,7 @@
 #include "sql_partition.h"
 #include "string_with_len.h"
 #include "thr_lock.h"
+#include "trace_log.h"
 
 class Item;
 
@@ -1637,6 +1638,10 @@ bool MYSQL_BIN_LOG::write_transaction(THD *thd, binlog_cache_data *cache_data,
   */
   assert(thd->owned_gtid.sidno == THD::OWNED_SIDNO_ANONYMOUS ||
          thd->owned_gtid.sidno > 0);
+
+  /* TRACE: binlog_write */
+  TRACE_EVENT_FLOW("binlog", "binlog_write", "executor", "binlog",
+              thd->thread_id(), "Writing to binlog", "");
 
   int64 sequence_number, last_committed;
   /* Generate logical timestamps for MTS */

@@ -73,6 +73,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 #include <sys/syscall.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include "trace_log.h"
 
 static const int buf_flush_page_cleaner_priority = -20;
 #endif /* UNIV_LINUX */
@@ -1274,6 +1275,11 @@ returns true.
 @return true if page was flushed */
 bool buf_flush_page(buf_pool_t *buf_pool, buf_page_t *bpage,
                     buf_flush_t flush_type, bool sync) {
+  /* TRACE: flush_dirty */
+  TRACE_EVENT_FLOW_BG("data", "flush_dirty", "innodb", "data", "flushing",
+              ",\"thr\":\"background\",\"page_no\":%u",
+              bpage ? bpage->page_no() : 0);
+
   BPageMutex *block_mutex;
 
   ut_ad(flush_type < BUF_FLUSH_N_TYPES);
