@@ -1,0 +1,122 @@
+[
+  {
+    "cat": "meta",
+    "_title": "DELETE 标记删除",
+    "_type": "delete_mark",
+    "_icon": "🗑️",
+    "_color": "#ef4444",
+    "_sql": "DELETE FROM t WHERE id = 200",
+    "_desc": "B+ 树定位 id=200 → undo 记录删除 → redo → 事务提交 → 后续后台 purge",
+    "_tags": [
+      "标记删除",
+      "purge"
+    ],
+    "_n_events": 9,
+    "_n_btree": 2,
+    "_n_backtable": 0,
+    "_n_undo": 0,
+    "_n_hiddenptr": 0,
+    "_cat_conn": 4,
+    "_cat_sql": 3,
+    "_cat_btree": 2,
+    "file": "delete.jsonl"
+  },
+  {
+    "cat": "meta",
+    "_title": "INSERT 事务提交",
+    "_type": "insert_transaction",
+    "_icon": "➕",
+    "_color": "#22c55e",
+    "_sql": "INSERT INTO t (val, name) VALUES (12345, 'demo_insert')",
+    "_desc": "InnoDB 插入 → undo_write → redo_prepare → binlog_write → redo_commit 完整事务流程",
+    "_tags": [
+      "undo",
+      "redo",
+      "binlog"
+    ],
+    "_n_events": 18,
+    "_n_btree": 7,
+    "_n_backtable": 0,
+    "_n_undo": 1,
+    "_n_hiddenptr": 0,
+    "_cat_conn": 4,
+    "_cat_sql": 3,
+    "_cat_innodb": 2,
+    "_cat_btree": 7,
+    "_cat_undo": 1,
+    "_cat_binlog": 1,
+    "file": "insert.jsonl"
+  },
+  {
+    "cat": "meta",
+    "_title": "SELECT 回表演示",
+    "_type": "select_back_to_table",
+    "_icon": "🔍",
+    "_color": "#3b82f6",
+    "_sql": "SELECT name, val FROM t WHERE name = 'user_9999'",
+    "_desc": "二级索引 idx_name 3层 B+ 树搜索 → 查找 user_9999 → 回表 PRIMARY 取完整行",
+    "_tags": [
+      "B+树",
+      "回表"
+    ],
+    "_n_events": 28,
+    "_n_btree": 13,
+    "_n_backtable": 2,
+    "_n_undo": 0,
+    "_n_hiddenptr": 0,
+    "_cat_conn": 4,
+    "_cat_sql": 4,
+    "_cat_btree": 15,
+    "_cat_mvcc": 3,
+    "_cat_innodb": 1,
+    "_cat_redo": 1,
+    "file": "select-backtable.jsonl"
+  },
+  {
+    "cat": "meta",
+    "_title": "SELECT 范围扫描",
+    "_type": "select_range",
+    "_icon": "🔎",
+    "_color": "#6366f1",
+    "_sql": "SELECT id, name FROM t WHERE id BETWEEN 1000 AND 2000 LIMIT 10",
+    "_desc": "PRIMARY 聚簇索引 id BETWEEN 1000..2000 范围扫描 → 按序读取连续叶子页",
+    "_tags": [
+      "范围扫描"
+    ],
+    "_n_events": 19,
+    "_n_btree": 6,
+    "_n_backtable": 0,
+    "_n_undo": 0,
+    "_n_hiddenptr": 0,
+    "_cat_conn": 4,
+    "_cat_sql": 4,
+    "_cat_btree": 6,
+    "_cat_mvcc": 3,
+    "_cat_innodb": 1,
+    "_cat_redo": 1,
+    "file": "select-range.jsonl"
+  },
+  {
+    "cat": "meta",
+    "_title": "UPDATE MVCC 版本链",
+    "_type": "update_mvcc",
+    "_icon": "✏️",
+    "_color": "#f59e0b",
+    "_sql": "UPDATE t SET val = 99999 WHERE id = 100",
+    "_desc": "B+ 树定位 id=100 → hidden_ptrs 版本链更新 → undo → redo → binlog 事务提交",
+    "_tags": [
+      "隐藏指针",
+      "undo",
+      "MVCC"
+    ],
+    "_n_events": 9,
+    "_n_btree": 2,
+    "_n_backtable": 0,
+    "_n_undo": 0,
+    "_n_hiddenptr": 0,
+    "_cat_conn": 4,
+    "_cat_sql": 3,
+    "_cat_btree": 2,
+    "file": "update.jsonl"
+  }
+]

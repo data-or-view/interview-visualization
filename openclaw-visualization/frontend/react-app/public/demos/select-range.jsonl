@@ -1,0 +1,20 @@
+{"cat": "meta", "_title": "SELECT 范围扫描", "_type": "select_range", "_icon": "🔎", "_color": "#6366f1", "_sql": "SELECT id, name FROM t WHERE id BETWEEN 1000 AND 2000 LIMIT 10", "_desc": "PRIMARY 聚簇索引 id BETWEEN 1000..2000 范围扫描 → 按序读取连续叶子页", "_tags": ["范围扫描"], "_n_events": 19, "_n_btree": 6, "_n_backtable": 0, "_n_undo": 0, "_n_hiddenptr": 0, "_cat_conn": 4, "_cat_sql": 4, "_cat_btree": 6, "_cat_mvcc": 3, "_cat_innodb": 1, "_cat_redo": 1}
+{"no": "mysql", "ts": 1778073260768, "cat": "conn", "ev": "recv", "from": "client", "to": "connector", "cid": 67, "ts_state": "executing", "thr": "thread-per-conn", "input": "select @@version_comment limit 1"}
+{"no": "mysql", "ts": 1778073260768, "cat": "sql", "ev": "parse", "from": "connector", "to": "parser", "cid": 67, "ts_state": "parsing", "thr": "thread-per-conn", "input": "select @@version_comment limit 1"}
+{"no": "mysql", "ts": 1778073260768, "cat": "sql", "ev": "optimize", "from": "parser", "to": "optimizer", "cid": 67, "ts_state": "optimizing", "thr": "thread-per-conn"}
+{"no": "mysql", "ts": 1778073260771, "cat": "conn", "ev": "recv", "from": "client", "to": "connector", "cid": 67, "ts_state": "executing", "thr": "thread-per-conn", "input": "select $$"}
+{"no": "mysql", "ts": 1778073260771, "cat": "conn", "ev": "recv", "from": "client", "to": "connector", "cid": 67, "ts_state": "executing", "thr": "thread-per-conn", "input": "SELECT id, name FROM t WHERE id BETWEEN 1000 AND 2000 LIMIT 10"}
+{"no": "mysql", "ts": 1778073260771, "cat": "sql", "ev": "parse", "from": "connector", "to": "parser", "cid": 67, "ts_state": "parsing", "thr": "thread-per-conn", "input": "SELECT id, name FROM t WHERE id BETWEEN 1000 AND 2000 LIMIT 10"}
+{"no": "mysql", "ts": 1778073260772, "cat": "sql", "ev": "optimize", "from": "parser", "to": "optimizer", "cid": 67, "ts_state": "optimizing", "thr": "thread-per-conn"}
+{"cat": "btree", "ev": "btree_search", "ts": 1778073260772, "index": "PRIMARY", "type": "clustered", "table": "btree_test/t", "page_no": 4, "level": 1, "n_recs": 1010, "child_pg": 9}
+{"no": "mysql", "ts": 1778073260772, "cat": "btree", "ev": "btree_search", "from": "btree", "to": "btree", "ts_state": "searched", "index": "PRIMARY", "type": "clustered", "table": "btree_test/t", "page_no": 9, "level": 0, "n_recs": 426}
+{"cat": "btree", "ev": "btree_search", "ts": 1778073260772, "index": "PRIMARY", "type": "clustered", "table": "btree_test/t", "page_no": 4, "level": 1, "n_recs": 1010, "child_pg": 18}
+{"no": "mysql", "ts": 1778073260772, "cat": "btree", "ev": "btree_search", "from": "btree", "to": "btree", "ts_state": "searched", "index": "PRIMARY", "type": "clustered", "table": "btree_test/t", "page_no": 18, "level": 0, "n_recs": 417}
+{"no": "mysql", "ts": 1778073260772, "cat": "mvcc", "ev": "read_view", "from": "innodb", "to": "mvcc", "ts_state": "Creating snapshot", "trx_id": 0}
+{"cat": "btree", "ev": "btree_search", "ts": 1778073260772, "index": "PRIMARY", "type": "clustered", "table": "btree_test/t", "page_no": 4, "level": 1, "n_recs": 1010, "child_pg": 9}
+{"no": "mysql", "ts": 1778073260772, "cat": "btree", "ev": "btree_search", "from": "btree", "to": "btree", "ts_state": "searched", "index": "PRIMARY", "type": "clustered", "table": "btree_test/t", "page_no": 9, "level": 0, "n_recs": 426}
+{"no": "mysql", "ts": 1778073260772, "cat": "innodb", "ev": "commit", "from": "innodb", "to": "innodb", "cid": 67, "ts_state": "committing", "thr": "thread-per-conn"}
+{"no": "mysql", "ts": 1778073260772, "cat": "mvcc", "ev": "read_done", "from": "mvcc", "to": "innodb", "ts_state": "Snapshot closed", "trx_id": 0}
+{"no": "mysql", "ts": 1778073260772, "cat": "redo", "ev": "redo_commit", "cid": 67, "ts_state": "flushing redo log", "thr": "thread-per-conn"}
+{"no": "mysql", "ts": 1778073260773, "cat": "conn", "ev": "cleaning", "from": "connector", "to": "external", "cid": 67, "ts_state": "cleaning up", "thr": "thread-per-conn"}
+{"no": "mysql", "ts": 1778073260773, "cat": "mvcc", "ev": "read_done", "from": "mvcc", "to": "innodb", "ts_state": "Snapshot closed", "trx_id": 0}

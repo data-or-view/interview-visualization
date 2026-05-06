@@ -12,6 +12,8 @@ export function useTraceData(url) {
       .then(text => {
         const lines = text.trim().split('\n').filter(Boolean)
         const parsed = lines.map((l, i) => { try { return JSON.parse(l) } catch { return null } }).filter(Boolean)
+        // 过滤掉 meta 事件（演示描述头，不在可视化中展示）
+        .filter(d => d.cat !== 'meta')
         setEvents(parsed)
         setLoading(false)
       })

@@ -1,0 +1,10 @@
+{"cat": "meta", "_title": "DELETE 标记删除", "_type": "delete_mark", "_icon": "🗑️", "_color": "#ef4444", "_sql": "DELETE FROM t WHERE id = 200", "_desc": "B+ 树定位 id=200 → undo 记录删除 → redo → 事务提交 → 后续后台 purge", "_tags": ["标记删除", "purge"], "_n_events": 9, "_n_btree": 2, "_n_backtable": 0, "_n_undo": 0, "_n_hiddenptr": 0, "_cat_conn": 4, "_cat_sql": 3, "_cat_btree": 2}
+{"no": "mysql", "ts": 1778073260812, "cat": "conn", "ev": "recv", "from": "client", "to": "connector", "cid": 70, "ts_state": "executing", "thr": "thread-per-conn", "input": "select @@version_comment limit 1"}
+{"no": "mysql", "ts": 1778073260812, "cat": "sql", "ev": "parse", "from": "connector", "to": "parser", "cid": 70, "ts_state": "parsing", "thr": "thread-per-conn", "input": "select @@version_comment limit 1"}
+{"no": "mysql", "ts": 1778073260812, "cat": "sql", "ev": "optimize", "from": "parser", "to": "optimizer", "cid": 70, "ts_state": "optimizing", "thr": "thread-per-conn"}
+{"no": "mysql", "ts": 1778073260813, "cat": "conn", "ev": "recv", "from": "client", "to": "connector", "cid": 70, "ts_state": "executing", "thr": "thread-per-conn", "input": "select $$"}
+{"no": "mysql", "ts": 1778073260814, "cat": "conn", "ev": "recv", "from": "client", "to": "connector", "cid": 70, "ts_state": "executing", "thr": "thread-per-conn", "input": "DELETE FROM t WHERE id = 200"}
+{"no": "mysql", "ts": 1778073260814, "cat": "sql", "ev": "parse", "from": "connector", "to": "parser", "cid": 70, "ts_state": "parsing", "thr": "thread-per-conn", "input": "DELETE FROM t WHERE id = 200"}
+{"cat": "btree", "ev": "btree_search", "ts": 1778073260815, "index": "PRIMARY", "type": "clustered", "table": "btree_test/t", "page_no": 4, "level": 1, "n_recs": 1010, "child_pg": 7}
+{"no": "mysql", "ts": 1778073260815, "cat": "btree", "ev": "btree_search", "from": "btree", "to": "btree", "ts_state": "searched", "index": "PRIMARY", "type": "clustered", "table": "btree_test/t", "page_no": 7, "level": 0, "n_recs": 215}
+{"no": "mysql", "ts": 1778073260815, "cat": "conn", "ev": "cleaning", "from": "connector", "to": "external", "cid": 70, "ts_state": "cleaning up", "thr": "thread-per-conn"}

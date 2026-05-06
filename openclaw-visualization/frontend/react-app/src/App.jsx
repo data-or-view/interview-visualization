@@ -5,6 +5,7 @@ import NodeGraph from './components/NodeGraph'
 import InfoPanel from './components/InfoPanel'
 import Timeline from './components/Timeline'
 import BtreeCanvas from './components/BtreeCanvas'
+import DemoPanel from './components/DemoPanel'
 import './App.css'
 
 export default function App() {
@@ -16,6 +17,22 @@ export default function App() {
   const [playing, setPlaying] = useState(false)
   const [loopMode, setLoopMode] = useState(true)
   const [viewMode, setViewMode] = useState('arch') // 'arch' | 'btree'
+  const [demoSql, setDemoSql] = useState('')
+  const [demoInfo, setDemoInfo] = useState(null)
+
+  const handleLoadDemo = useCallback((meta) => {
+    setDemoSql(meta._sql || '')
+    setDemoInfo(meta)
+    setUrl('/demos/' + meta.file)
+    setCurrentIndex(-1)
+    setPlaying(true)
+    // Auto-switch view: SELECT demos → B+ tree, DML → architecture
+    if (meta._type && meta._type.startsWith('select')) {
+      setViewMode('btree')
+    } else {
+      setViewMode('arch')
+    }
+  }, [])
 
   // 自动播放
   useEffect(() => {
@@ -84,6 +101,29 @@ export default function App() {
         </button>
         <div style={{ width: 1, height: 20, background: '#30363d' }} />
 
+        {/* Demo SQL 展示条 */}
+        {demoSql && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            background: '#1e293b', borderRadius: 6, padding: '2px 10px',
+            border: '1px solid #2d3748', flex: 1, maxWidth: 500, minWidth: 200,
+          }}>
+            <span style={{ color: '#667eea', fontSize: '0.7rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+              {demoInfo?.title?.slice(0, 8) || 'SQL'}
+            </span>
+            <code style={{
+              color: '#e2e8f0', fontSize: '0.72rem', fontFamily: 'monospace',
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>{demoSql}</code>
+            <button onClick={() => { setDemoSql(''); setDemoInfo(null); setUrl('/data/trace-mysql.jsonl') }}
+              style={{ ...btnStyle, padding: '1px 6px', fontSize: '0.65rem', marginLeft: 'auto', whiteSpace: 'nowrap' }}>
+              ✕ 清除
+            </button>
+          </div>
+        )}
+
+        <div style={{ width: 1, height: 20, background: '#30363d' }} />
+
         <span style={{ color: '#64748b', fontSize: '0.75rem' }}>数据:</span>
         <input value={url} onChange={e => setUrl(e.target.value)}
           style={{ width: 200, background: '#0d1117', border: '1px solid #30363d', borderRadius: 4,
@@ -111,6 +151,9 @@ export default function App() {
       {/* 主体 */}
       {viewMode === 'arch' ? (
         <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', padding: 8, borderRight: '1px solid #30363d', overflow: 'auto' }}>
+            <DemoPanel onLoadDemo={handleLoadDemo} />
+          </div>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {loading ? (
               <span style={{ color: '#64748b' }}>加载中...</span>
@@ -136,6 +179,9 @@ export default function App() {
         </div>
       ) : (
         <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', padding: 8, borderRight: '1px solid #30363d', overflow: 'auto' }}>
+            <DemoPanel onLoadDemo={handleLoadDemo} />
+          </div>
           <div style={{ flex: 1, overflow: 'auto' }}>
             {loading ? (
               <span style={{ color: '#64748b', padding: 40, display: 'block' }}>加载中...</span>
